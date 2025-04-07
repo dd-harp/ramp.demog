@@ -1,0 +1,26 @@
+url: https://dd-harp.github.io/ramp.demog/
+navbar:
+  left:
+  - text: Articles
+    menu:
+    - text: Aging
+      href: articles/aging.html
+  - text: Functions
+    href: reference/index.html
+  right:
+  - icon: fa-github
+    href: https://github.com/dd-harp/ramp.demog/
+home:
+  sidebar:
+    structure:
+    - links
+    - license
+    - community
+    - citation
+    - authors
+    - dev
+reference:
+- title: Aging
+  desc: "Specialized methods to implement aging \n"
+  contents: UnevenAgingMatrix
+
