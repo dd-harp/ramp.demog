@@ -1,0 +1,81 @@
+---
+title: "Stratification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Stratification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Here, we describe how to set up models with vital dynamics -- **births,** **deaths,** and **population migration** -- and functions that stratify a human population along several traits, including age.  The use cases: 
+
++ Vital dynamics, including **Births** and **Deaths** are critical for managing malaria as demography changes population denominators.  
+
++ **Migration** - Time spent is a concept that applies to a domestic lifestyle, but in some models, it might be useful to create dynamic strata that change residences. In other cases, time spent can be turned off and a model can get configured to handle nomadism:
+
+    - Population migration 
+    
+    - Seasonal migration 
+    
+    - Nomadism 
+
++ Stratification by **Age** with **Aging** -- some models for malaria epidemiology are formulated as cohort models, and other models would benefit from adding age. 
+
+    - Births are added to the youngest stratum of the population  
+    
+    - Age-specific mortality 
+    
+    - Each stratum gets an age-dependent search weight for blood feeding 
+    
+    - A set of base strata get segmented by age, with some fraction of the population *aging up* 
+
++ **Epidemiological Heterogeneity** 
+
+    - Static differences in care seeking, exposure, or travel
+    
+    - Dynamic differences, such as own / don't own bednet 
+    
+    
+## Basic Setup 
+
+`ramp.xds` was designed to be structurally flexible to handle many different kinds of conditions. The ports and junctions are built into the software, and it handles *spatial dynamics* through a *time spent* matrix and the concept of *time at risk.* The capability of stratifying populations based on differences in time spent is part of basic setup, so that `nStrata` and `nPatches` are not necessarily the same thing. While this was built-in to basic setup, the functionality to handle everything else is set up but turned off. 
+
+## Advanced Setup 
+
+The challenge is to make these elaborations play nice together, so we have developed several options for **advanced setup**: 
+
++ `setup_demography_*` - sets up the structures for a model that does *something,* rather than the base case that does *nothing.* In setting up the model with the capability of doing *something,* the model actually gets reconfigured so that it still does *nothing,* but it works a lot harder to do so.
+
+    - an $N_p \times N_p$ *no migration* matrix is set up to model migration by the *residency* patch (*i.e.* not conditioned on differences in time spent), but it is set to zero.  
+    
+    - the structures are set up to model stratification to handle epidemiological heterogeneity 
+    
+    - the structures are set up to model aging, but there is a single age stratum  
+
++ `setup_migration_*` - replaces the *no migration* matrix with a model for migration 
+
++ `setup_births_*` - configure a population birth rate
+
++ `split_by_biting` - splits population strata to modify blood feeding *search weights* 
+
++ `split_by_treatment` -  
+
++ `split_by_travel` - 
+
++ `split_by_sex` -
+
++ `split_by_age` - 
+    
+    - set up an aging matrix for a set of *age classes* 
+
+    - set up the birth class so births are added to the youngest class 
+    
+    - modify blood feeding *search weights* by age 
+    
+    - set up age-specific mortality 
+    
+## Internals
+
+What makes all this possible is the use of *membership* vectors and matrices for orthogonal expansions. 
+
+
