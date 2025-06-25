@@ -75,9 +75,55 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="rampdemog">ramp.demog<a class="anchor" aria-label="anchor" href="#rampdemog"></a>
+<div class="page-header"><h1 id="rampdemog">
+<code>ramp.demog</code><a class="anchor" aria-label="anchor" href="#rampdemog"></a>
 </h1></div>
-<p>Demographic utilities for ramp.xds</p>
+<div class="section level2">
+<h2 id="utilities-for-human-demography-and-orthogonal-stratification">Utilities for Human Demography and Orthogonal Stratification<a class="anchor" aria-label="anchor" href="#utilities-for-human-demography-and-orthogonal-stratification"></a>
+</h2>
+<p>The primary purpose of <code>ramp.demog</code> is to provide support for <code>ramp.xds</code> to build and solve models with human demography and stratification for epidemiological heterogeneity on age and other epidemiological traits.</p>
+<p>The utilities in this package set up and configure:</p>
+<ul>
+<li>
+<code>Hmatrix</code> a matrix, <span class="math inline">$\bf H,$</span> to compute all dynamical transitions among population strata, called by <code>dHdt</code> and for every state variable <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">X,</annotation></semantics></math> it computes:</li>
+</ul>
+<p><span class="math display">$${\bf H} \cdot X$$</span></p>
+<ul>
+<li>
+<code>Amatrix</code> a matrix, <span class="math inline">$\bf A,$</span> to compute dynamical transitions for tracking variables. For every tracking variable, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">W,</annotation></semantics></math> it computes</li>
+</ul>
+<p><span class="math display">$${\bf A} \cdot W$$</span></p>
+<p>In this package, we have also developed a set of functions to check the accuracy of models that use age-stratification against a cohort model.</p>
+<div class="section level3">
+<h3 id="demography">Demography<a class="anchor" aria-label="anchor" href="#demography"></a>
+</h3>
+<p>Demographic functions supported include:</p>
+<ul>
+<li><p><strong>Aging</strong> - set up and solve models that stratify a population by age</p></li>
+<li><p><strong>Age specific mortality</strong> - to develop models for age-specific mortality using data describing human populations by age</p></li>
+<li><p><strong>Births</strong> - set up and solve models with a births; in age-structured models, into the class that includes newborns</p></li>
+<li><p><strong>Migration</strong> - defined here to include a change of residence, including seasonal labor migration and some forms of nomadism</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="orthogonal-stratification">Orthogonal Stratification<a class="anchor" aria-label="anchor" href="#orthogonal-stratification"></a>
+</h3>
+<p>To support development of models for malaria policy, we have also developed a set of utilities to <em>stratify</em> a population along other traits. To set up and solve models with dynamical strata, we have implemented a method we call <em>principled stratification</em> that defines a subset of all possible models. In a nutshell, we create one matrix for each process. For example:</p>
+<ol style="list-style-type: decimal">
+<li>A matrix describing residence and time spent;</li>
+<li>A matrix describing migration among patches;</li>
+<li>A matrix describing aging among age classes</li>
+</ol>
+<p>In the set up, each stratum belongs to a residence and time spent matrix. In the next step, we develop a migration matrix, where every resident of a patch has the same probability of migrating to every other patch. Next, we split each stratum by age; every daughter stratum inherits the features of its parent stratum. The total number of strata is the product of the number of substrata for each trait. In this case, migration does not split so we have the product of the number of strata along a time spent vector.</p>
+<p>Setup thus outputs a generalized linear matrix <code>dHdt</code> describing demography and dynamic transitions among strata. We also have a matrix <code>dAdt</code> that describes aging (for tracking variables).</p>
+<p>We note that it is possible to formulate and run a model with any matrix, <code>Hmatrix</code>, so long as it has the right shape.</p>
+<p>For example, suppose we have a <code>residence</code> vector <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">1, 1, 2, 3</annotation></semantics></math> on <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math> patches with a migration matrix <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math> and the residence matrix <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>J</mi><mi>r</mi></msub><annotation encoding="application/x-tex">J_r</annotation></semantics></math>, and we have two age classes, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">1,2</annotation></semantics></math> with an aging matrix <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. There are a total of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>8</mn><annotation encoding="application/x-tex">8</annotation></semantics></math> strata, but <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math> is a <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">3 \times 3</annotation></semantics></math> matrix and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> is a <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2 \times 2</annotation></semantics></math> matrix. We formulate the membership matrix for aging, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>J</mi><mi>a</mi></msub><annotation encoding="application/x-tex">J_a</annotation></semantics></math> and full matrix by taking:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>J</mi><mi>a</mi><mi>T</mi></msubsup><mo>⋅</mo><mi>A</mi><mo>⋅</mo><msub><mi>J</mi><mi>a</mi></msub><mo>+</mo><msubsup><mi>J</mi><mi>r</mi><mi>T</mi></msubsup><mo>⋅</mo><mi>M</mi><mo>⋅</mo><msub><mi>J</mi><mi>r</mi></msub></mrow><annotation encoding="application/x-tex">
+J_a^T \cdot A \cdot J_a +  J_r^T \cdot M \cdot J_ r
+</annotation></semantics></math></p>
+<p>At some point, <code>ramp.xds</code> made the decision to compute the derivative <code>dHdt</code> for human population density. In compartment models, a population is sub-divided into <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math> mutually exclusive and collectively exhaustive states (MECE), but since the state variables describe densities and they sum up to <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">H,</annotation></semantics></math> only <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">N-1</annotation></semantics></math> of the state variables need to be computed. We also adopted the convention that the compartment that would be omitted is the state with newborns.</p>
+</div>
+</div>
 </div>
   </div>
 
@@ -101,7 +147,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>David L. Smith <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-4367-3849" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>David L. Smith <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-4367-3849" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -118,7 +164,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
