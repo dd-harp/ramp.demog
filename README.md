@@ -6,13 +6,13 @@ The primary purpose of `ramp.demog` is to provide support for `ramp.xds` to buil
 
 The utilities in this package set up and configure: 
 
-+ `Hmatrix` a matrix, $\bf H,$  to compute all dynamical transitions among population strata, called by `dHdt` and for every state variable $X,$ it computes: 
++ `Hmatrix` a matrix, $\mathbf H,$  to compute all dynamical transitions among population strata, called by `dHdt` and for every state variable $X,$ it computes: 
 
-$${\bf H} \cdot X$$
+$$\mathbf{H} \cdot X$$
 
-+ `Amatrix` a matrix, $\bf A,$ to compute dynamical transitions for tracking variables. For every tracking variable, $W,$ it computes 
++ `Amatrix` a matrix, $\mathbf A,$ to compute dynamical transitions for tracking variables. For every tracking variable, $W,$ it computes 
 
-$${\bf A} \cdot W$$
+$$\mathbf{A} \cdot W$$
 
 
 In this package, we have also developed a set of functions to check the accuracy of models that use age-stratification against a cohort model.
