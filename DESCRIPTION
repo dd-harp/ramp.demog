@@ -1,16 +1,23 @@
 Package: ramp.demog
-Title: Human demographic models for `ramp.xds` 
-Version: 0.0.0.9000
+Title: Human demography for `ramp.xds` 
+Version: 0.1
 Authors@R: c(
       person("David L.", "Smith", email = "smitdave@uw.edu", role = c("aut","cre"), comment = c(ORCID = "0000-0003-4367-3849"))
     )
-Description: `ramp.demog` provides utilities and functions to set up human demographic models in `ramp.xds` including births, deaths, aging, and migration
-License: GPL (>= 3)
+Description: 
+   Utilities and functions to set up the human component for models in **`ramp.xds`**. Functions are available to
+   set up vital dynamics -- births and deaths -- and to configure aging and migration. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://dd-harp.github.io/ramp.demog/
 Remotes: 
   github::dd-harp/ramp.xds
+  github::dd-harp/ramp.func
 Depends:
-  ramp.xds
+  ramp.xds,
+  ramp.func
+Suggests:
+  knitr
+VignetteBuilder: knitr

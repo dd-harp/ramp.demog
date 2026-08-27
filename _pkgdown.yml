@@ -5,7 +5,11 @@ navbar:
     menu:
     - text: Aging
       href: articles/aging.html
-  - text: Functions
+    - text: Stratification
+      href: articles/Stratification.html
+    - text: Membership
+      href: articles/membership.html
+  - text: Reference
     href: reference/index.html
   right:
   - icon: fa-github
@@ -22,5 +26,10 @@ home:
 reference:
 - title: Aging
   desc: "Specialized methods to implement aging \n"
-  contents: UnevenAgingMatrix
+  contents: 
+  - xds_solve_cohort
+  - UnevenAgingMatrix
+  - catcat
+  - make_demography_matrix
+  
 
