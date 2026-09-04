@@ -27,7 +27,6 @@ reference:
 - title: Aging
   desc: "Specialized methods to implement aging \n"
   contents: 
-  - xds_solve_cohort
   - UnevenAgingMatrix
   - catcat
   - make_demography_matrix
