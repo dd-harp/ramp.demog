@@ -1,0 +1,8 @@
+---
+title: "Care Seeking"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Care Seeking}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---

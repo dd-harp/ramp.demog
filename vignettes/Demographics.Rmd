@@ -1,0 +1,10 @@
+---
+title: "Demographic Change"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Demographic Change}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+By *demographic change,* we mean that there is population flow among the strata. The two principle kinds of demographic change are aging in an age-structured population and migration. 

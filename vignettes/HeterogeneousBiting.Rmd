@@ -1,0 +1,119 @@
+---
+title: "Heterogeneous Biting"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Heterogeneous Biting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The number of mosquito bites or blood meals per person is highly heterogeneous in populations for several reasons. 
+
++ Some differences in exposure are handled through the *time spent* matrix, and the associated concept of *time at risk.*
+
++ The term *heterogeneous biting* is often used to describe differences in the expected number of infective bites per person in a stratified population: it usually describes a kind of *frailty,* a multiplicative difference in the expected number of bites, per person, in some stratum.  
+
++ The expectation for a homogenous stratum could have a distribution. If, for example, the expected number of bites per person is *gamma* distributed, then the number of bites per person would follow a negative binomial distrbibution. In SimBA, this is called *environmental heterogeneity.* 
+
+Here, we discuss how SimBA has implemented heterogeneous biting. Exposure in **`ramp.xds`** is discussed in the online documentation (see [`ramp.xds` ::Exposure](https://dd-harp.github.io/ramp.xds/articles/Exposure.html)). 
+For a longer discssion, see the
+[SimBA :: Exposure](https://faculty.washington.edu/smitdave/simba/exposure.html)
+vignette on the SimBA website. 
+
+*** 
+
+## Biting Weights 
+
+In **`ramp.xds`**, differences in the expected number of bites per person are handled through stratification, but *heterogeneous biting* must work in any context, regardless of who else is present.  If we stratified a population and assigned a frailty term *a priori* and then filled an area with people who had the same biting rate, the number of bites by the mosquito population would scale with that frailty term, and biting among humans in that area would be homogenous. A consistent mathematical formulation was handled by assigning a *search weight* to each human population stratum as part of the **blood feeding interface,** so that heterogeneous biting would work in context, no matter who else is present. 
+
+The search weight is a linear modifier that is used to compute the fraction of bites received by an individual in the $i^{th}$ stratum. If $w_i$ is the search weight, $\theta_{j,i}$ the time spent in the $j^{th}$ patch by the $i^{th}$ stratum, and $H_i$ the number of people in in each stratum, then the fraction of bites received is: 
+
+$$
+\frac{\theta_{j,i} w_i}{\sum_{k}\theta_{j,k} w_k H_k}
+$$
+To guarantee some mathematical consistency, the blood feeding model uses the biting weights to compute *availability,* and the mosquito model can compute the *blood feeding rate* as a function of availability. 
+
+## Basic Setup 
+
+```{r}
+library(ramp.xds)
+library(ramp.func)
+```
+
+```{r}
+devtools::load_all("~/git/ramp.xds")
+```
+
+
+```{r}
+mod <- xds_setup(nPatches=5, residence = c(1,2,3,4), searchB = c(4:1))
+get_blood_search_weights(mod)
+```
+
+## Advanced Setup 
+
+Many of the functions to modify search weights are found in **`ramp.xds`**, with the `S3` function `setup_blood_search_weights`, which is designed to work intuitively.  If a new valid set of search weights gets passed as the first argument, they replace the old ones. 
+
+```{r}
+mod <- setup_blood_search_weights(c(2:5), mod) 
+get_blood_search_weights(mod)
+```
+
+This is equivalent to calling: 
+
+```{r}
+mod <- setup_blood_search_weights("as_is", mod, list(weights=c(2:5))) 
+get_blood_search_weights(mod)
+```
+
+The new search weights must be positive, and there must be one for each stratum. If not, the function returns an error 
+
+```{r, eval=F}
+setup_blood_search_weights(c(2:4), mod)
+```
+Since this would return an error message, the code block does not get evaluated when this vignette is built. The error message that would be returned if executed is: 
+
+> <span style="color:red">Error</span> in check_blood_search_weights(blood_search_weights, xds_obj$nStrata[i]) :
+> length(blood_search_weights) == nStrata is not TRUE
+
+### Random Search Weights 
+
+```{r}
+mod <- setup_blood_search_weights("random" , mod) 
+get_blood_search_weights(mod)
+```
+
+### Dynamic Search Weights
+
+Options are available to set up dynamic search weights: 
+
+```{r}
+library(ramp.demog)
+devtools::load_all()
+```
+
+## Stratification
+
+Perhaps more usefully, functions in *`ramp.demog`* do *progressive stratification,* including stratification by biting  
+
+### Heterogeneous Biting
+
+```{r}
+mod <- xds_setup(nPatches=5, residence = c(1,2,3,4), searchB = c(4:1))
+cbind(get_H(mod), get_blood_search_weights(mod))
+```
+
+The function `split_base_by_search_weights` subdivides each population stratum by a vector `splits` and multiplies each new stratum by the `factors`. In the following example 20% of the population gets a new biting weight that is a factor of 4 higher, while 50% gets a new biting weight that is a factor of 4 lower. 30% remains unchanged. In the following, the new weights are put in matrix form, each row showing the search weights for three new strata derived from teh first. 
+
+```{r}
+mod <- split_base_by_search_weights(c(.2, .3, .5), c(4, 1, .25), mod)
+t(matrix(get_blood_search_weights(mod), 3, 4))
+```
+```{r}
+t(matrix(get_H(mod), 3, 4))
+```
+
+
+### Heterogeneous Biting by Age
+
+If a population is stratified by age, a biting weight can be assigned to each age class. The `splits` are computed from information about survival by age. New biting weights by age can be passed at setup as `factors`.

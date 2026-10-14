@@ -1,0 +1,31 @@
+---
+title: "Heterogeneity"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Heterogeneity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+`ramp.demog` 
+
+## Heterogeneous Biting
+
+`ramp.xds` has taken a fairly comprehensive approach to exposure, including *search weights* to model. To learn more and see examples, read the vignette on [Heterogeneous Biting](Heterogeneity.html). 
+
+## Care Seeking
+
+see 
+
+
+## Travel
+
+
+
+
+
+***
+
+
+

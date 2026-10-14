@@ -1,0 +1,73 @@
+---
+title: "Births"
+subtitle: "Setting up the Population Birth Rate" 
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Births}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`Births` is a generic `S3` function that returns the *daily* population birth rate. Set up options for the population birth rate are:
+
++ "zero" 
+
++ "constant"
+
++ "ts_func" 
+
+The birth functions reconfigured for an age-structured population after running `stratify_by_age` 
+
+# Examples 
+
+```{r}
+library(ramp.xds)
+library(ramp.func)
+library(ramp.demog)
+```
+
+In `ramp.xds`, we define `Births` and `setup_births` for advanced setup. 
+
+## `zero`, the default
+
+It's methods are: 
+
+- `Births.zero` is the default, and it can also be reset by running `setup_births`
+
+```{r}
+mod <- xds_setup(residence = c(1,1,2,2), nPatches=3) 
+class(mod$XH_obj[[1]]$birth_obj)
+```
+We can verify what the birth rates look like: 
+
+```{r}
+Births(0, mod, 1)
+```
+
+## `constant` 
+
+- `Births.constant` sets up `birth_rates` for each stratum using `setup_births`
+
+    - After changing the birth rates, a function is called to compute $dH/dt$ 
+    
+    - if $dH/dt$ is not approximately zero, the options are set for dynamic blood feeding and transmission. 
+
+```{r}
+birth_rates = 5:8
+mod <- setup_births("constant", mod, list(birth_rates=birth_rates), i=1)
+Births(0, mod, 1)
+```
+
+## `ts_func` 
+ 
+- `Births.ts_func` where the `birth_rates` are multiplied by a multiplicative time series function. The following example sets up daily birth rates with a 3% annual growth rate.
+
+```{r}
+birth_rates = 9:12
+mod <- setup_births("ts_func", mod, list(birth_rates=birth_rates, trend_par = makepar_F_exp(rate=0.03/365, N=4)), i=1)
+Births(365, mod, 1)
+```
+
+## Age Structure
+ 
+In populations with age structure, after the base strata have been split into age-structured strata, all the births occur in the newborn (first) age class. For an example, see [Age Structure](AgeStructure.html)

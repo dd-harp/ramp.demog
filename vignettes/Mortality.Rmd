@@ -1,0 +1,71 @@
+---
+title: "Mortality"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mortality}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Given data describing human survival, the workflows should be set up to compute: 
+
++ A function, $F_\mu(a),$ to simulate cohort dynamics: $F_\mu$ returns per-capita daily mortality rates as a function of age.
+ 
++ For a mesh on age, $m_a,$ compute death rates by age class for age-structured models, $\mu_a,$ 
+
+*** 
+
+One of the purposes of `ramp.demog` is to add accurate models of human demography to mosquito-borne disease models for policy purposes. 
+
+## Cohort Dynamics
+
+Let $\mu(a)$ describe the per-capita daily mortality rate as a function of age $a$ (in days). We want a function that computes the death rate by age in some interesting way to test. 
+
+Using data from the [Uganda population](https://www.populationpyramid.net/mortality/uganda/2026/) we pull some points and develop a function that fits. 
+
+```{r, eval=F}
+male = c(30.1, 2.6, 0.85, 0.73, 1.4, 2.2, 6.5)
+female = c(23.1, 2.2, 0.68, 0.55, 0.9, 1.3, 4.3)
+breaks = c(0, 1, 5, 10, 15, 20, 40)
+```
+
+Let $\mu(a)$ denote malaria survival by age. 
+
+```{r}
+morty = function(a){
+  (40.4*(exp(-5*a)*.8 + exp(-0.5*a)*.15 + exp(-.07*a)*.05) +  0.3*(a-10) + .1)/365/1000/80
+}
+```
+
+```{r fig.height=4, fig.width=7}
+aa = seq(0, 80, by=.1)
+plot(aa, morty(aa)*365000,  type = "l",  xlab = "Age (in Years)", ylab = expression(list(mu(a), "Death Rate")))
+```
+Now, we set it up: 
+
+```{r}
+library(ramp.xds)
+library(ramp.func)
+library(ramp.forcing)
+library(ramp.demog)
+```
+
+
+
+
+```{r}
+mod <- xds_setup_eir(eir=1/365)
+mod <- setup_deaths("func", mod, list(F_mu=morty))
+mod <- xds_solve_cohort(mod, Amax=80*365,da=10)
+```
+
+```{r fig.height=4, fig.width=7}
+plot(mod$outputs$time/365, mod$outputs$orbits$XH[[1]]$H, type = "l", xlab = "Age(in Days)", ylab = "H")
+```
+
+
+```{r}
+tail(mod$outputs$orbits$XH[[1]]$H)
+```
+
+
