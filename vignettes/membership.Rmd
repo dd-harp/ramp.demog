@@ -7,6 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Suppose that we had stratified a population by age (with $n_a$ strata), residency in a patch ($n_p$), and other epidemiologically relevant traits ($n_i$). The number of strata is: $$n_s = n_a \times n_p \times n_1 \times n_2 \times ...$$
+To compute or process anything, we develop membership matrices $M_x.$ If $v$ is a variable defined for each stata then can some by $x$ by simply taking a dot product. Suppose, for example, that $M_a$ is the membership matrix for age strata. If we want to sum by age, then we would take $$M_a \cdot v.$$ 
+It is such a general problem that we need a simple coding solution. 
+The following describes how these membership matrices are handled in `ramp.demog`
+
+***
+
 The function `catcat` was developed to compute membership vectors for multi-dimensional spaces. 
 
 ```{r}

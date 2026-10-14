@@ -1,0 +1,8 @@
+---
+title: "Travel"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Travel}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---

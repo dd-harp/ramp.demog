@@ -1,8 +1,110 @@
 ---
 title: "Aging"
+subtitle: "Malaria Epidemiology in Populations by Age Over Time" 
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Aging}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+# Malaria by Age over Time 
+
+This is a very brief introduction to *age* and *time* in **SimBA**
+
+## Cohort dynamics 
+
+Immunity to malaria develops with age and exposure, and age plays an important role in malaria epidemiology and policy, so we find it useful to formulate models for epidemiology as cohort dynamics: the independent variable is age $a$ (not time $t$). 
+
+The FoI is now a function of age. For any particular stratum, born on day $d$, at time $t$ the person is of age $a+d$, so we can model the FoI in a population where the EIR is some known functino of time $E(t)$: 
+
+$$
+h(a, d) = F_h\left(\omega(a) E(a+d), \mathbf{X} \right)
+$$
+
+The state space is $\mathbf X(a)$, and the dynamics in a single cohort (born on day $d$) are given by:
+
+$$
+\frac{\textstyle{d\mathbf X(a)}}{\textstyle{da}} = F_\mathbf{X}\left(h(a,d), \mathbf{X}(a) \right) - \mu(a) \mathbf{X}(a) \tag{1}
+$$
+
+The population is initialized such that the cohort size, $H$, are all in one of these states: without loss of generality, we let it be the first
+$$\mathbf{X} = \left(H, 0, 0, ... \right)$$
+(If there are good reasons for births to enter two or more states, it can be accommodated, but we'll just go with this for now.)
+
+Cohort dynamics are enabled in `ramp.xds` through `xds_setup_eir` and `xds_solve_cohort`.  
+
+```{r}
+library(ramp.xds)
+library(ramp.library)
+```
+
+```{r, fig.width=7, fig.height=4}
+cohort_model <- xds_setup_eir(Xname = "garki", eir = 1/365)
+cohort_model <- xds_solve_cohort(cohort_model, Amax=3650, da=20)
+xds_plot_X(cohort_model)
+```
+
+```{r}
+library(ramp.func)
+library(ramp.forcing)
+library(ramp.demog)
+```
+
+```{r}
+cohort_model <- change_season(makepar_F_sin(), cohort_model)
+cohort_model <- change_age(makepar_F_type2(), cohort_model)
+```
+
+
+## All Cohorts 
+
+While this is conceptually useful, malaria policy is interested in malaria in populations, so we must think about age and time. Now, we think about all the cohorts all at once, so the state space is $\mathbf X(a, t)$ with dynamics:
+
+$$
+\frac{\textstyle{\partial \mathbf X(a,t)}}{\textstyle{\partial a}} + \frac{\textstyle{\partial \mathbf X(a,t)}}{\textstyle{\partial t}} 
+= F_\mathbf{X}\left(h(a,t), \mathbf{X}(a,t)\right) - \mu(a,t) \mathbf{X}(a,t) \tag{2}
+$$
+with the boundary condition: 
+$$ 
+\mathbf{X}(0,t) = B(t)
+$$
+
+
+## Galerkin
+
+Since `ramp.xds` is designed for structured population models (and not partial differential equations), we take the general approach of stratifying a population by age.
+For most applications, we want to model malaria in a set of populations with respect to time, which implies segmenting the population by age and using Galerkin methods. 
+
+For a mesh on age with $n-1$ breakpoints, we get $n$ strata. The state space now is a stage-structured set of $n$ strata, $\mathbf X(t).$ We let $\omega_i$ be the age-specific relative biting rate. The mesh on age implies that there is a *demographic* matrix, $\mathbf D$ that handles mortality (at the stage-specific rate $\mu_i$) with the form:  
+
+$$
+\mathbf{D} = \left[
+\begin{array}{cccccc}
+- \mu_1 - \alpha_1 & 0 & 0 & \cdots & 0 & 0  \\ 
+\alpha_1 & -\mu_2 -\alpha_2 & 0 & \cdots & 0 & 0 \\
+0 & \alpha_2 & - \mu_3 - \alpha_3 & \cdots & 0 & 0 \\ 
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\ 
+0 & 0 &0 & \cdots & \alpha_{n-1} & -\mu_n \\
+\end{array} \right]
+$$
+
+The FoI for all the strata is given by: 
+
+$$
+\vec h(t) = F_b\left(\vec \omega E(t), \mathbf{\vec X} \right)
+$$
+
+The dynamics of malaria in an age-structured population are now given by: 
+
+ 
+
+$$
+\frac{\textstyle{d \mathbf{\vec X}}}{\textstyle{dt}} = B(t) + F_{\mathbf{X}} \left( \vec h(t), \mathbf{\vec X} \right) + \mathbf{D} \cdot \mathbf{\vec X} \tag{3}
+$$
+
+where the birth function $B(t)$ adds only to the *birth state* in the youngest stratum. 
+
+## `ramp.demog`
+
+The challenge for `ramp.demog` is to build models of the form given by Equation 3, which are considered approximations of the form given by Equation 1 or 2.  

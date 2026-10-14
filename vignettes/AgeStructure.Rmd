@@ -1,0 +1,10 @@
+---
+title: "Age Structure"
+subtitle: "Stratification by Age" 
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Age Structure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+

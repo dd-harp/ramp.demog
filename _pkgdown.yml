@@ -3,12 +3,28 @@ navbar:
   left:
   - text: Articles
     menu:
-    - text: Aging
+    - text: Births
+      href: articles/Births.html
+    - text: Deaths
+      href: articles/Mortality.html
+    - text: Demographic Change
+      href: articles/Demographics.html
+    - text: Cohort Dynamics vs. Age Structure
       href: articles/aging.html
-    - text: Stratification
+    - text: Heterogeneity and Stratification
       href: articles/Stratification.html
     - text: Membership
       href: articles/membership.html
+  - text: Stratification
+    menu:
+    - text: Age Structure
+      href: articles/AgeStructure.html
+    - text: Heterogeneous Biting
+      href: articles/HeterogeneousBiting.html
+    - text: Travel
+      href: articles/Travel.html
+    - text: Care Seeking
+      href: articles/CareSeeking.html
   - text: Reference
     href: reference/index.html
   right:
@@ -24,11 +40,34 @@ home:
     - authors
     - dev
 reference:
-- title: Aging
+- title: Heterogeneity
   desc: "Specialized methods to implement aging \n"
   contents: 
+  - split_base_by_care_seeking
+  - split_base_by_search_weights
+  - split_base_by_travel
+- title: Cohort Dynamics
+  desc: "Specialized methods to implement aging \n"
+  contents:
+  - xds_cohort_pr
+  - get_pr_by_age_mesh
+- title: Dynamic Strata
+- subtitle: Age Structure
+  desc: "Specialized methods to implement aging \n"
+  contents:
+  - stratify_by_age  
+  - get_dynamic_strata
   - UnevenAgingMatrix
+- subtitle: Migration
+  desc: "Specialized methods to implement aging \n"
+  contents:
+  - setup_migration
+  - check_migration
+  - get_migration_matrix
+- title: Utilities
+  desc: "Specialized methods to implement aging \n"
+  contents: 
+  - make_membership_matrix
   - catcat
-  - make_demography_matrix
+  - make_tsy_function
   
-
